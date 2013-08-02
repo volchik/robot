@@ -1,57 +1,32 @@
 # coding: utf-8
 import logging
 from threading import RLock
-from I2C import I2C
-import serial
 import time
 
-I2C_MODE = 1
-USART_MODE = 2
+import serial
 
 logger = logging.getLogger(__name__)
 
 
-class I2CTransport(object):
-    def __init__(self, address):
-        self.i2c = I2C(address)
-        self.address = address
+class Robot(object):
+    def __init__(self, device):
+        logger.info(u'открытие порта %s...' % device)
         self.lock = RLock()
-
-    def send(self, data):
-        with self.lock:
-            self.busy = True
-            for char in data:
-                self.i2c.write_byte(ord(char))
-            self.i2c.write_byte(13)
-        return data
-
-    def close(self):
-        pass
-
-
-class USARTTransport(object):
-    def __init__(self, port):
-        self.port = serial.Serial(port, 9600, timeout=0.1)
+        try:
+            self.port = serial.Serial(device, 9600, timeout=0.1)
+            logger.info(u'порт открыт')
+        except Exception as e:
+            logger.error(u'ошибка: %s' % e.message)
         time.sleep(1)  # todo: сделать по нормальному
-        self.lock = RLock()
 
-    def send(self, data):
+    def invoke(self, data):
         with self.lock():
             self.port.write(data + '\r')
-            result = self.port.readline()
-            return result.replace('\n', '').replace('\r', '')
+            result = self.port.readline().replace('\n', '').replace('\r', '')
+            logger.info(u'обработка посылки "%s" -> "%s"' % (data, result))
+            return result
 
     def close(self):
+        logger.info(u'порт закрыт')
         self.port.close()
 
-
-class Robot(object):
-    def __init__(self, mode, address):
-        self.mode = mode
-        if self.mode == I2C_MODE:
-            self.transport = I2CTransport(address)
-        elif self.mode == USART_MODE:
-            self.transport = USARTTransport(address)
-
-    def invoke(self, command):
-        return self.transport.send(command)
