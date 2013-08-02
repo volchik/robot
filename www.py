@@ -149,6 +149,7 @@ class MyHandler(BaseHTTPRequestHandler):
 	                                self.end_headers()
 	                                self.wfile.write(f.read())
 	                                f.close()
+					#self.log_error("file: "+self.path+" has file type "+file_type(self.path))
         	                except IOError:
                 	                self.send_error(404,'File not found: %s' % self.path)
 			else: #access denied
