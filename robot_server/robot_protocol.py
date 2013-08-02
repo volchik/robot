@@ -6,22 +6,6 @@ from robot import Robot
 import logging
 
 logger = logging.getLogger(__name__)
-ALIASES = {
-    "move_forward": "MU",
-    "move_backward": "MD",
-    "move_left": "ML",
-    "move_right": "MR",
-    "cam_up": "CU",
-    "cam_down": "CD",
-    "cam_left": "CL",
-    "cam_right": "CR",
-    "W": "CU",
-    "Z": "CD",
-    "A": "CL",
-    "S": "CR",
-    "get_temperature": "TG",
-    "get_pressure": "PG",
-}
 
 
 class RobotFactory(protocol.Factory):
@@ -34,14 +18,14 @@ class RobotFactory(protocol.Factory):
             logger.info(u'сервер запущен в режиме заглушки. подключение к роботу не выполнено')
 
     def buildProtocol(self, addr):
+        logger.info(u'установлено подключение с %s' % addr.host)
         return RobotProtocol(self)
 
     def invoke_command(self, command):
-        command = ALIASES.get(command, command)
         if not self.dummy:
             result = self.robot.invoke(command)
         else:
-            result =command
+            result = command
         logger.info(u'отправлено роботу: "%s"' % command)
         logger.info(u'получено в ответ: "%s"' % result)
         return result
@@ -50,9 +34,13 @@ class RobotFactory(protocol.Factory):
 class RobotProtocol(LineReceiver):
     def __init__(self, factory):
         self.factory = factory
+        self.delimiter = '\n'
 
     def lineReceived(self, line):
-        result = self.factory.invoke_command(line)
-        self.transport.write(result+'\n')
+        result = self.factory.invoke_command(line.strip())
+        self.sendLine(result)
+
+    def connectionLost(self, reason=protocol.connectionDone):
+        logger.info(u'подключение закрыто: %s' % reason.value)
 
 
