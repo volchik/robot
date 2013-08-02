@@ -27,7 +27,7 @@ def file_ext(filename):
 
 def file_type(filename):
 	try:
-		ext = get_ext(filename)
+		ext = file_ext(filename)
 		if ext2conttype.get(ext) != None:
 			return ext2conttype.get(ext)
 	except:
