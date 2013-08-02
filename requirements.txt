@@ -1,0 +1,4 @@
+configobj
+twisted
+pyopencv
+Pillow
