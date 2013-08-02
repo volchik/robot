@@ -35,10 +35,10 @@ def start_server(config_file):
     config = Config(config_file)
     configure_logging(config)
 
-    factory = RobotFactory(config.device, dummy=config.dummy)
+    factory = RobotFactory(config.device)
     reactor.listenTCP(config.port, factory)
     logger.info("starting server...")
-    reactor.callLater(0, logger.info, "started")
+    reactor.callLater(0, logging.info, "ok")
     reactor.run()
     logger.info("server stopped")
 
