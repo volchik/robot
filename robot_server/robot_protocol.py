@@ -6,22 +6,6 @@ from robot import Robot
 import logging
 
 logger = logging.getLogger(__name__)
-ALIASES = {
-    "move_forward": "MU",
-    "move_backward": "MD",
-    "move_left": "ML",
-    "move_right": "MR",
-    "cam_up": "CU",
-    "cam_down": "CD",
-    "cam_left": "CL",
-    "cam_right": "CR",
-    "W": "CU",
-    "Z": "CD",
-    "A": "CL",
-    "S": "CR",
-    "get_temperature": "TG",
-    "get_pressure": "PG",
-}
 
 
 class RobotFactory(protocol.Factory):
@@ -37,12 +21,11 @@ class RobotFactory(protocol.Factory):
         return RobotProtocol(self)
 
     def invoke_command(self, command):
-        command = ALIASES.get(command, command)
+        logger.info(u'отправлено роботу: "%s"' % command)
         if not self.dummy:
             result = self.robot.invoke(command)
         else:
-            result =command
-        logger.info(u'отправлено роботу: "%s"' % command)
+            result = command
         logger.info(u'получено в ответ: "%s"' % result)
         return result
 
@@ -55,6 +38,6 @@ class RobotProtocol(LineReceiver):
 
     def lineReceived(self, line):
         result = self.factory.invoke_command(line)
-        self.transport.write(result+'\n')
+        self.transport.write(result + '\n')
 
 
