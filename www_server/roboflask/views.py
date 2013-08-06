@@ -17,6 +17,7 @@ def index():
 def mjpeg():
     def jpeg_generator(camera, fps):
         delay = 1 / fps
+        logger.info('serving mjpeg, delay=%.2f' % delay)
         last_time = time.time()
         while True:
             image = camera.get_image()
@@ -34,7 +35,7 @@ def mjpeg():
             last_time = time.time()
 
     # todo куда-нибудь вынести fps
-    fps = 0.2
+    fps = current_app.camera.fps
     return Response(stream_with_context(jpeg_generator(current_app.camera, fps)),
                     content_type='multipart/x-mixed-replace; boundary=--aaboundary')
 

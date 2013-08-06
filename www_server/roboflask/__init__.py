@@ -21,6 +21,7 @@ def prepare_app(config):
     else:
         logger.info('using real camera')
         app.camera = camera.Camera(config.cam_num)
+    app.camera.fps = config.cam_fps
     app.robot = robot_client.RobotClient(config.robot_host, config.robot_port)
     return app
 

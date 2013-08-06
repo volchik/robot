@@ -7,3 +7,4 @@ robot_port = 9090
 robot_host = 'localhost'
 dummy_cam = True
 cam_num = 6
+cam_fps = 5
