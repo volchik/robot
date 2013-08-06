@@ -1,0 +1,5 @@
+log_file = 'puzi_server.log'
+log_level = 'info'
+log_to_stdout = False
+pid_file = 'pid/puzi_server.pid'
+port = 9091
