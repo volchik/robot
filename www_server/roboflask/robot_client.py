@@ -30,6 +30,7 @@ class RobotClient(object):
     def _recv(self):
         while True:
             data = self.socket.recv(4096)
+            logger.debug('получены данные %r' % data)
             if not data:
                 logger.info('connection closed')
                 return
@@ -41,8 +42,11 @@ class RobotClient(object):
                 return result
 
     def invoke(self, command, check=True):
+        logger.info(u"отправка комманды %s" % command)
         self._send(command)
+        logger.info(u"ожидание ответа...")
         result = self._recv()
+        logger.info(u"ответ получен: %s" % result)
         if check and result != command:
             raise RuntimeError(result)
         return result
