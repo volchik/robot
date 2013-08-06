@@ -2,11 +2,18 @@
 # coding: utf-8
 from flask import Flask
 import camera
+from roboflask import robot_client
 
 app = Flask(__name__)
-app.config['CAMREADER'] = camera.CamReader()
-app.config['CAM_FPS'] = 0.2
 
 import views
 
+
+def prepare_app(config):
+    global app
+    assert not hasattr(app, 'camreader')
+    assert not hasattr(app, 'robot_client')
+    app.camreader = camera.CamReader()
+    app.robot = robot_client.RobotClient(config.robot_host, config.robot_port)
+    return app
 

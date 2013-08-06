@@ -1,10 +1,12 @@
 #!/usr/bin/env python
 # coding: utf-8
 from __future__ import division
-from flask import render_template, Response, current_app, abort, stream_with_context
+from flask import render_template, Response, current_app, request, stream_with_context, abort
 from roboflask import app
 import time
+import logging
 
+logger = logging.getLogger(__name__)
 
 @app.route('/')
 def index():
@@ -14,7 +16,7 @@ def index():
 @app.route('/mjpeg')
 def mjpeg():
     def jpeg_generator(camreader, fps):
-        delay = 1/fps
+        delay = 1 / fps
         last_time = time.time()
         while True:
             image = camreader.get_image()
@@ -31,23 +33,31 @@ def mjpeg():
                 time.sleep(wait)
             last_time = time.time()
 
-    camreader = current_app.config.get('CAMREADER')
-    fps = current_app.config.get('CAM_FPS', 1)
-    if camreader:
-        return Response(stream_with_context(jpeg_generator(camreader, fps)),
-                        content_type='multipart/x-mixed-replace; boundary=--aaboundary')
-    abort(500, 'no camreader')
+    # todo куда-нибудь вынести fps
+    fps = 0.2
+    return Response(stream_with_context(jpeg_generator(current_app.camreader, fps)),
+                    content_type='multipart/x-mixed-replace; boundary=--aaboundary')
 
 
 @app.route('/jpeg')
 def jpeg():
-    camreader = current_app.config.get('CAMREADER')
-    if camreader:
-        return Response(camreader.get_image(), 200, content_type='image/jpeg')
-    abort(500, 'no camreader')
+    return Response(current_app.camreader.get_image(), 200, content_type='image/jpeg')
 
 
-@app.route('/temperature')
-def temperature():
-    pass
+@app.route('/invoke/<command>', methods=['POST', 'GET'])
+def invoke(command):
+    method = getattr(current_app.robot, command, None)
+    if callable(method):
+        logger.info('requested command %s(%s)' % (command, ', '.join(['='.join(i) for i in request.args.items()])))
+        result = method(**request.args)
+        if result:
+            return result
+        else:
+            return '%s - OK!' % command
+    else:
+        abort(404)
 
+
+@app.route('/main')
+def main():
+    return render_template('main.html')

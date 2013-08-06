@@ -15,6 +15,8 @@ class Config(object):
         self.pid_file = os.path.join(config_dir, config.get('pid_file', 'pid/www_server.pid'))
         self.log_to_stdout = config.get('log_to_stdout', False)
         self.port = config.get('port', 9091)
+        self.robot_host = config.get('robot_host', 'localhost')
+        self.robot_port = config.get('robot_port', 9090)
         self.log_dir = os.path.dirname(self.log_file)
 
     def create_dirs(self):

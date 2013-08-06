@@ -5,9 +5,16 @@ import functools
 import logging
 import os
 import sys
+from twisted.internet.endpoints import TCP4ServerEndpoint
+from twisted.web.server import Site
+from twisted.web.wsgi import WSGIResource
 from daemon import Daemon
 from config import Config
 import roboflask
+from twisted.internet import reactor
+
+
+logger = logging.getLogger('main')
 
 
 def configure_logging(config):
@@ -25,7 +32,21 @@ def configure_logging(config):
 
 def start_server(config):
     configure_logging(config)
-    roboflask.app.run(port=config.port)
+    app = roboflask.prepare_app(config)
+
+    resource = WSGIResource(reactor,
+                            reactor.getThreadPool(),
+                            app)
+    factory = Site(resource)
+    endpoint = TCP4ServerEndpoint(reactor, config.port)
+    d = endpoint.listen(factory)
+    logger.info(u"starting sq_server...")
+    d.addCallback(lambda _: logger.info(u'порт открыт'))
+    d.addErrback(lambda failure: (logger.error(u'ошибка открытия порта: %s' % failure.getErrorMessage()) or
+                                  logger.error(u'stopping reactor') or
+                                  reactor.callLater(0, reactor.stop)))
+
+    reactor.run()
 
 
 class Server(Daemon):

@@ -3,3 +3,5 @@ log_level = 'info'
 log_to_stdout = False
 pid_file = 'pid/puzi_server.pid'
 port = 9091
+robot_port = 9090
+robot_host = 'localhost'
