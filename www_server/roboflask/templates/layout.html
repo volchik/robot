@@ -1,0 +1,28 @@
+<!DOCTYPE HTML>
+<html xmlns="http://www.w3.org/1999/html">
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+{% block script %}
+{% endblock %}
+<head>
+    {% block head %}
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+        <!--<style type="text/css">-->
+            <!--body {-->
+                <!--padding-top: 60px;-->
+                <!--padding-bottom: 40px;-->
+            <!--}-->
+        <!--</style>-->
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap-responsive.min.css') }}">
+
+        <title> {% block title %}{% endblock %}</title>
+    {% endblock %}
+</head>
+<body>
+
+{% block body %}
+
+{% endblock %}
+</body>
+
+
