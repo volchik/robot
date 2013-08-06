@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 # coding: utf-8
+import sys
+reload(sys)
+sys.setdefaultencoding('utf-8')
 import argparse
 import functools
 import logging
@@ -40,7 +43,7 @@ def start_server(config):
     factory = Site(resource)
     endpoint = TCP4ServerEndpoint(reactor, config.port)
     d = endpoint.listen(factory)
-    logger.info(u"starting sq_server...")
+    logger.info(u"starting www_server...")
     d.addCallback(lambda _: logger.info(u'порт открыт'))
     d.addErrback(lambda failure: (logger.error(u'ошибка открытия порта: %s' % failure.getErrorMessage()) or
                                   logger.error(u'stopping reactor') or

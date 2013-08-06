@@ -1,22 +1,48 @@
 #!/usr/bin/env python
 #coding: utf-8
-# todo прикрутить реконнект
-
+# todo: допилить реконнект
+import logging
 from socket import socket, AF_INET, SOCK_STREAM
+
+logger = logging.getLogger(__name__)
 TIMEOUT = 5
 
 
 class RobotClient(object):
+    delimiter = b'\n'
+
     def __init__(self, host, port, timeout=TIMEOUT):
+        self.reconnect = True
+        self.timeout = timeout
+        self.host = host
+        self.port = port
+        self.buffer = ''
+        self._connect()
+
+    def _connect(self):
         self.socket = socket(AF_INET, SOCK_STREAM)
-        self.socket.settimeout(timeout)
-        self.socket.connect((host, port))
-        self.fileobj = self.socket.makefile()
+        self.socket.settimeout(self.timeout)
+        self.socket.connect((self.host, self.port))
+
+    def _send(self, data):
+        self.socket.send(data + self.delimiter)
+
+    def _recv(self):
+        while True:
+            data = self.socket.recv(4096)
+            if not data:
+                logger.info('connection closed')
+                return
+            self.buffer += data
+
+            if self.delimiter in self.buffer:
+                result, rest = self.buffer.split(self.delimiter, 1)
+                self.buffer = rest
+                return result
 
     def invoke(self, command, check=True):
-        self.fileobj.write(command + '\n')
-        self.fileobj.flush()
-        result = self.fileobj.readline().strip()
+        self._send(command)
+        result = self._recv()
         if check and result != command:
             raise RuntimeError(result)
         return result

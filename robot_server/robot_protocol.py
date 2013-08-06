@@ -48,6 +48,8 @@ class RobotFactory(protocol.Factory):
 
 
 class RobotProtocol(LineReceiver):
+    delimiter = b'\n'
+
     def __init__(self, factory):
         self.factory = factory
 

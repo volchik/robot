@@ -57,9 +57,10 @@
             if (r == null) r = document.getElementById("resolution").value
             $.ajax({
                 type: "POST",
-                url: "./",
-                data: "resolution=" + r,
+                url: "/set_resolution/" + r,
                 success: function (html) {
+                    $("#result").empty();
+                    $("#result").append("resolution changed to " + html);
                 }
             });
         }
@@ -186,9 +187,9 @@
             </tr>
             <tr>
                 <td align="center" colspan="3">
-                    <input type="button" value="480x360" onclick="SetResolution(0)">
-                    <input type="button" value="640x480" onclick="SetResolution(1)">
-                    <input type="button" value="1280x1024" onclick="SetResolution(2)">
+                    <input type="button" value="480x360" onclick="SetResolution('480x360')">
+                    <input type="button" value="640x480" onclick="SetResolution('640x480')">
+                    <input type="button" value="1280x1024" onclick="SetResolution('1280x1024')">
                 </td>
             </tr>
         </table>

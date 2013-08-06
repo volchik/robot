@@ -18,6 +18,8 @@ class Config(object):
         self.robot_host = config.get('robot_host', 'localhost')
         self.robot_port = config.get('robot_port', 9090)
         self.log_dir = os.path.dirname(self.log_file)
+        self.dummy_cam = config.get('dummy_cam', False)
+        self.cam_num = config.get('cam_num', 0)
 
     def create_dirs(self):
         for f in (self.log_file, self.pid_file):
